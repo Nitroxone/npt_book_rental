@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.sdv.npt.npt_book_rental.exceptions.BookAlreadyExistsException;
 import com.sdv.npt.npt_book_rental.exceptions.BookNotFoundException;
+import com.sdv.npt.npt_book_rental.exceptions.NotEnoughBookDataException;
 import com.sdv.npt.npt_book_rental.model.Book;
 import com.sdv.npt.npt_book_rental.repositories.BookRepository;
 
@@ -24,21 +25,10 @@ public class BookServiceImpl implements BookService {
      * Generates a String that contains formatted info about all registered books in the database and returns it.
      * @return a formatted String
      */
-    public String getFormattedBooksList() {
+    public List<Book> getBooksList() {
         List<Book> books = repo.findAll();
-        String message = "List of books\n";
 
-        for(Book book : books) {
-            message += String.format(
-                "[%1$s]. %2$s (%3$s)", 
-                book.getId(), 
-                book.getName(), 
-                book.getAuthor()
-            );
-            message += "\n";
-        }
-
-        return message;
+        return books;
     }
 
     public void registerBook(Book book) throws BookAlreadyExistsException {
@@ -65,19 +55,34 @@ public class BookServiceImpl implements BookService {
         repo.save(foundBook.get());
     }
 
-    public String getBookDetails(String id) throws BookNotFoundException {
+    public void removeBook(String id) throws BookNotFoundException {
+        Optional<Book> foundBook = repo.findById(Long.parseLong(id));
+        if (foundBook.isPresent()) {
+            repo.delete(foundBook.get());
+        } else throw new BookNotFoundException("No book found with ID " + id);
+    }
+
+    public Book getBookDetails(String id) throws BookNotFoundException {
         Optional<Book> foundBook = repo.findById(Long.parseLong(id));
         if (!foundBook.isPresent()) {
             throw new BookNotFoundException("Tried to retrieve a book that doesn't exist.");
         }
 
-        return String.format(
-            "ID: %1$s\nName: %2$s\nAuthor: %3$s\nPublish date: %4$s\nAvailable copies: %5$s", 
-            foundBook.get().getId(), 
-            foundBook.get().getName(), 
-            foundBook.get().getAuthor(), 
-            foundBook.get().getPublishDate(), 
-            foundBook.get().getAmount()
-        );
+        return foundBook.get();
+    }
+
+    public List<Book> search(Book book) throws NotEnoughBookDataException {
+        List<Book> results = null;
+        
+        if (book.getName() != null) {
+            if (book.getAuthor() != null) results = repo.findByNameAndAuthor(book.getName(), book.getAuthor());
+            else results = repo.findByName(book.getName());
+        } else if (book.getAuthor() != null) {
+            results = repo.findByAuthor(book.getAuthor());
+        } else {
+            throw new NotEnoughBookDataException("Too little search data was provided to find a book.");
+        }
+
+        return results;
     }
 }
