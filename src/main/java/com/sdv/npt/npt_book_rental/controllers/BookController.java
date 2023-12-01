@@ -1,13 +1,8 @@
 package com.sdv.npt.npt_book_rental.controllers;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,15 +18,13 @@ import com.sdv.npt.npt_book_rental.exceptions.NotEnoughBookDataException;
 import com.sdv.npt.npt_book_rental.model.Book;
 import com.sdv.npt.npt_book_rental.services.BookService;
 
+import lombok.AllArgsConstructor;
+
 @RestController
+@AllArgsConstructor
 public class BookController {
     
-    @Autowired
     public BookService bookService;
-
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     @GetMapping("/list_books")
     public ResponseEntity<List<Book>> listAllBooks() {

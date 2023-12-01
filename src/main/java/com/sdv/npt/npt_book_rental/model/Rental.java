@@ -1,11 +1,11 @@
 package com.sdv.npt.npt_book_rental.model;
 
-import java.util.List;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,16 +18,21 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="db_user")
+@Table(name="rental")
 @Entity
-public class User {
+public class Rental {
+
+    public static final int RENTAL_LIMIT = 5;
+    
     @Id
     @GeneratedValue
     private Long id;
-    private String username;
-    private String email;
-    private String password;
 
-    @OneToMany
-    private List<Book> rentedBooks;
+    @ManyToOne
+    private User rentedBy;
+
+    @ManyToOne
+    private Book rentedBook;
+
+    private LocalDate returnDate;
 }
