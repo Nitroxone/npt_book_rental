@@ -2,6 +2,7 @@ package com.sdv.npt.npt_book_rental.model;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -20,10 +21,15 @@ import lombok.ToString;
 @Table(name = "book")
 @Entity
 public class Book {
+    
+    public static final int DEFAULT_BOOK_AMOUNT = 50;
+
     @Id
     @GeneratedValue
     private Long id;
     private String name;
     private String author;
     private Date publishDate;
+    @Column(nullable = true)
+    private Integer amount;
 }
